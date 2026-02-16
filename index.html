@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Revany Angel Portfolio</title>
+        
+        <script src="https://cdn.tailwindcss.com"></script>
+        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+        <script>
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Inter', 'sans-serif'],
+                            mono: ['JetBrains Mono', 'monospace'],
+                        },
+                        colors: {
+                            neon: '#22d3ee', // Cyan-400 equivalent
+                            darkbg: '#0f172a', // Slate-900
+                            cardbg: '#1e293b', // Slate-800
+                        },
+                        animation: {
+                            'float': 'float 6s ease-in-out infinite',
+                        },
+                        keyframes: {
+                            float: {
+                                '0%, 100%': { transform: 'translateY(0)' },
+                                '50%': { transform: 'translateY(-10px)' },
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+
+        <style>
+            /* Custom Scrollbar */
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #0f172a; 
+            }
+            ::-webkit-scrollbar-thumb {
+                background: #334155; 
+                border-radius: 4px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background: #22d3ee; 
+            }
+
+            /* Utility for Reveal Animation */
+            .reveal {
+                opacity: 0;
+                transform: translateY(30px);
+                transition: all 0.8s ease-out;
+            }
+            .reveal.active {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            /* Mobile menu animation */
+            #mobile-menu {
+                transition: opacity 220ms ease, transform 220ms ease;
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            #mobile-menu.open {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            /* Profile overlay specifics */
+            .profile-overlay {
+                backdrop-filter: blur(4px);
+            }
+        </style>
+    </head>
+    <body class="bg-darkbg text-slate-300 font-sans antialiased selection:bg-neon selection:text-darkbg overflow-x-hidden">
+
+        <nav class="fixed w-full z-50 backdrop-blur-md bg-darkbg/80 border-b border-slate-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex-shrink-0">
+                        <span class="font-mono text-xl font-bold text-neon">&lt;Portfolio&gt;</span>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-8">
+                            <a href="#home" class="hover:text-neon px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+                            <a href="#about" class="hover:text-neon px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
+                            <a href="#showcase" class="hover:text-neon px-3 py-2 rounded-md text-sm font-medium transition-colors">Work</a>
+                            <a href="#contact" class="px-4 py-2 border border-neon text-neon rounded-md text-sm font-medium hover:bg-neon hover:text-darkbg transition-all shadow-[0_0_10px_rgba(34,211,238,0.3)]">Let's Talk</a>
+                        </div>
+                    </div>
+                    <div class="-mr-2 flex md:hidden">
+                        <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 focus:outline-none" aria-controls="mobile-menu" aria-expanded="false" aria-label="Toggle mobile menu">
+                            <i class="fa-solid fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- Mobile menu (hidden by default) -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-darkbg/95 border-t border-slate-800">
+                <a href="#home" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-neon">Home</a>
+                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-neon">About</a>
+                <a href="#showcase" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-neon">Work</a>
+                <a href="#contact" class="block px-3 py-3 mt-1 border border-neon text-neon rounded-md text-base font-medium hover:bg-neon hover:text-darkbg">Let's Talk</a>
+            </div>
+        </div>
+
+        <section id="home" class="min-h-screen flex items-center justify-center relative pt-16">
+            <div class="absolute inset-0 z-0 opacity-20" style="background-image: radial-gradient(#334155 1px, transparent 1px); background-size: 30px 30px;"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="flex justify-center items-center">
+                        <!-- Profile image wrapper (larger, aligned with text) -->
+                        <div class="relative group w-48 h-48 md:w-72 md:h-72 md:mr-8">
+                            <!-- Replace the src with your local image at `assets/images/profile.jpg` if desired -->
+                            <img src="assets/images/2.jpg" alt="Revany Angel" class="rounded-full object-cover w-full h-full shadow-2xl transform transition-all duration-500 group-hover:scale-105 group-hover:rotate-1 ring-4 ring-transparent group-hover:ring-neon/60" />
+
+                            <!-- (optional overlay placeholder kept commented) -->
+                            <!--
+                            <div class="profile-overlay absolute inset-0 rounded-full bg-darkbg/75 flex items-center justify-center text-center p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                                <div>
+                                    <p class="text-neon font-mono text-sm mb-1">Revany Angel</p>
+                                    <p class="text-slate-200 text-sm">Mahasiswa TI • Frontend & UI/UX</p>
+                                </div>
+                            </div>
+                            -->
+                        </div>
+                    </div>
+
+                    <div class="text-center md:text-left">
+                        <p class="font-mono text-neon mb-4 tracking-wider animate-pulse">HELLO, WORLD.</p>
+                        <h1 class="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
+                            I am <span class="font-light">Revany Angel</span>
+                        </h1>
+                        <p class="mt-2 max-w-xl mx-auto md:mx-0 text-lg text-slate-400 mb-6">
+                            I have strong interest in Front End Development, eager to learn and have experience working on several projects, both mini projects and team projects.
+                        </p>
+
+                        <div class="flex justify-center md:justify-start gap-4">
+                            <a href="#showcase" class="group relative px-6 py-3 font-bold text-darkbg rounded-full bg-neon overflow-hidden transition-all hover:shadow-[0_0_20px_rgba(34,211,238,0.6)]">
+                                <span class="relative z-10">Explore My Work</span>
+                                <div class="absolute inset-0 h-full w-full scale-0 rounded-full transition-all duration-300 group-hover:scale-100 group-hover:bg-white/30"></div>
+                            </a>
+                            <a href="#contact" class="px-6 py-3 font-bold text-white border border-slate-600 rounded-full hover:border-white transition-all">
+                                Contact Me
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-slate-500">
+                <i class="fa-solid fa-arrow-down text-xl"></i>
+            </div>
+        </section>
+
+        <section id="about" class="py-20 bg-cardbg/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                    
+                    <div class="reveal">
+                        <h2 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
+                            <span class="text-neon font-mono">01.</span> About Me
+                        </h2>
+                        <p class="text-slate-400 leading-relaxed mb-6">
+                            I am an Informatics Engineering student who have experienced in building responsive web interfaces using HTML, CSS, and JavaScript through academic and personal projects. Detail-oriented in UI consistency and user experience. Currently expanding skills in modern front-end practices and committed to continuous improvement. 
+                        </p>
+                        <!-- <p class="text-slate-400 leading-relaxed mb-8">
+                            Saya juga memiliki ketertarikan dalam hal web development. Saya telah mempelajari dasar-dasar pengembangan web secara otodidak, serta mengembangkan beberapa proyek sederhana sebagai latihan. Saya bersemangat untuk terus belajar dan mengasah keterampilan saya di bidang ini.
+                        </p> -->
+                        
+                        <!-- <div class="flex gap-8 border-t border-slate-700 pt-6">
+                            <div>
+                                <span class="block text-3xl font-bold text-white">3+</span>
+                                <span class="text-sm text-slate-500 font-mono">Years Coding</span>
+                            </div>
+                            <div>
+                                <span class="block text-3xl font-bold text-white">20+</span>
+                                <span class="text-sm text-slate-500 font-mono">Projects Done</span>
+                            </div>
+                        </div> -->
+                    </div>
+
+                    <div class="reveal relative bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl">
+                        <div class="absolute -top-4 -right-4 w-20 h-20 bg-neon/20 rounded-full blur-2xl"></div>
+                        
+                        <!-- <h3 class="font-mono text-center text-slate-300 mb-6 border-b border-slate-700 pb-2">The Hybrid Stack</h3> -->
+                        
+                        <div class="grid grid-cols-1 gap-8">
+                            <div class="text-center border-r border-slate-700 pr-4">
+                                <h4 class="text-neon font-bold mb-4"><i class="fa-solid fa-code"></i> DEVELOPMENT</h4>
+                                <ul class="space-y-2 font-mono text-sm text-slate-400">
+                                    <li class="hover:text-white transition-colors">HTML5 & Semantic</li>
+                                    <li class="hover:text-white transition-colors">CSS</li>
+                                    <li class="hover:text-white transition-colors">JavaScript</li>
+                                    <li class="hover:text-white transition-colors">React (Basic)</li>
+                                </ul>
+                            </div>
+                            
+                            <!-- <div class="text-left pl-4">
+                                <h4 class="text-lime-400 font-bold mb-4"><i class="fa-solid fa-pen-nib"></i> CREATIVE</h4>
+                                <ul class="space-y-2 font-mono text-sm text-slate-400">
+                                    <li class="hover:text-white transition-colors">Document Formatting</li>
+                                    <li class="hover:text-white transition-colors">Graphic Design</li>
+                                    <li class="hover:text-white transition-colors">Video Editing</li>
+                                </ul>
+                            </div> -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="showcase" class="py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-3xl font-bold text-white mb-4">
+                        <span class="text-neon font-mono">02.</span> Selected Works
+                    </h2>
+                    <p class="text-slate-400 max-w-xl mx-auto">
+                        Koleksi terpilih dari Front End Projects yang telah dibuat.
+                    </p>
+                </div>
+
+                <div class="columns-1 md:columns-2 lg:columns-4 gap-6 space-y-6 reveal">
+                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
+                        <img src="assets/images/web 01.jpeg" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
+                            <h3 class="text-white font-bold text-xl">EDU VAULT</h3>
+                            <p class="text-slate-300 text-sm mt-2">Website penyedia layanan buku online, bisa disebut perpustakaan online yang menyediakan berbagai pilihan buku dan jurnal.</p>
+                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
+                                <a href="https://github.com/RevanyAngel/Edu-Vault" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Code
+                                </a>
+                                <a href="https://revanyangel.github.io/Edu-Vault/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Demo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
+                        <img src="assets/images/web 02.jpeg" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
+                            <h3 class="text-white font-bold text-xl">EPUB Reader</h3>
+                            <p class="text-slate-300 text-sm mt-2">Membuat website untuk menyimpan dan membaca buku dari file epub yang diunggah.</p>
+                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
+                                <a href="https://github.com/RevanyAngel/epub-reader-FST" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Code
+                                </a>
+                                <a href="https://epub-reader.ct.ws" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Demo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
+                        <img src="assets/images/web3.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
+                            <h3 class="text-white font-bold text-xl">Simple To Do list</h3>
+                            <p class="text-slate-300 text-sm mt-2">Membuat to do list sederhana sebagai pengingat aktivitas harian.</p>
+                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
+                                <a href="https://github.com/RevanyAngel/to-do-list" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Code
+                                </a>
+                                <a href="https://revanyangel.github.io/to-do-list/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Demo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
+                        <img src="assets/images/web2.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
+                            <h3 class="text-white font-bold text-xl">Age Calculator</h3>
+                            <p class="text-slate-300 text-sm mt-2">Membuat sistem penghitung umur yang dapat memberi tahu jumlah umur berdasarkan tanggal yang diinput secara otomatis dengan JS</p>
+                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
+                                <a href="https://github.com/RevanyAngel/Age-Calculator" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Code
+                                </a>
+                                <a href="https://revanyangel.github.io/Age-Calculator/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Demo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
+                        <img src="assets/images/web4.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
+                            <h3 class="text-white font-bold text-xl">Pomodoro TImer</h3>
+                            <p class="text-slate-300 text-sm mt-2">Membuat sistem Pomodoro yang dilengkapi dengan to do list dan distraction list untuk menunjang produktivitas.</p>
+                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
+                                <a href="https://github.com/RevanyAngel/MyTimer-v2" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Code
+                                </a>
+                                <a href="https://revanyangel.github.io/MyTimer-v2/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Demo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
+                        <img src="assets/images/web5.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
+                            <h3 class="text-white font-bold text-xl">Simple Homepage</h3>
+                            <p class="text-slate-300 text-sm mt-2">Membuat Homepage sederhana dengan memperhatikan responsiveness di berbagai perangkat.</p>
+                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
+                                <a href="https://github.com/RevanyAngel/simple-homepage" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Code
+                                </a>
+                                <a href="https://revanyangel.github.io/simple-homepage/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Demo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
+                        <img src="assets/images/web6.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
+                            <h3 class="text-white font-bold text-xl">Cookie Consent</h3>
+                            <p class="text-slate-300 text-sm mt-2">Membuat pop up cookies untuk keperluan website.</p>
+                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
+                                <a href="https://github.com/RevanyAngel/Cookie-Consent" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Code
+                                </a>
+                                <a href="https://revanyangel.github.io/Cookie-Consent/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Demo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
+                        <img src="assets/images/web7.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                            <span class="text-neon font-mono text-xs mb-2">Mini Game</span>
+                            <h3 class="text-white font-bold text-xl">Game Bunny Eating</h3>
+                            <p class="text-slate-300 text-sm mt-2">Membuat mini game bunny memakan wortel sebanyaknya untuk mendapat skor dan menghindari bom agar tidak game over.</p>
+                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
+                                <a href="https://github.com/RevanyAngel/Bunny-mam-wortel" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Code
+                                </a>
+                                <a href="https://revanyangel.github.io/Bunny-mam-wortel/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Demo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
+                        <img src="assets/images/web8.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                            <span class="text-neon font-mono text-xs mb-2">Mini Game</span>
+                            <h3 class="text-white font-bold text-xl">Memory Game</h3>
+                            <p class="text-slate-300 text-sm mt-2">Membuat mini game untuk melatih daya ingat dengan mencocokkan gambar yang sesuai.</p>
+                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
+                                <a href="https://github.com/RevanyAngel/memory-game" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Code
+                                </a>
+                                <a href="https://revanyangel.github.io/memory-game/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Demo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
+                        <img src="assets/images/web9.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                            <span class="text-neon font-mono text-xs mb-2">Mini Game</span>
+                            <h3 class="text-white font-bold text-xl">Snake Game</h3>
+                            <p class="text-slate-300 text-sm mt-2">Membuat mini game ular mencari poin agar ular semakin panjang tetapi jangan sampai tertabrak agar tidak game over.</p>
+                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
+                                <a href="https://github.com/RevanyAngel/mini-snake-game" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Code
+                                </a>
+                                <a href="https://revanyangel.github.io/mini-snake-game/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
+                                    Demo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-24 bg-cardbg/20 border-t border-slate-800">
+            <div class="max-w-3xl mx-auto px-4 text-center reveal">
+                <h2 class="text-3xl font-bold text-white mb-8">Ready to Collaborate?</h2>
+                <p class="text-slate-400 mb-10">
+                    Saya terbuka untuk kesempatan freelance atau proyek kolaborasi. Mari diskusikan bagaimana saya dapat membantu project Anda.
+                </p>
+                
+                <a href="mailto:revanypursan@gmail.com" class="inline-flex items-center gap-3 px-8 py-4 bg-neon text-darkbg font-bold rounded-lg hover:bg-white transition-all text-lg mb-12">
+                    <i class="fa-regular fa-envelope"></i> Kirim Email
+                </a>
+
+                <div class="flex justify-center gap-8 text-3xl">
+                    <a href="https://github.com/RevanyAngel" class="text-slate-500 hover:text-white transition-colors"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/revany-angel" class="text-slate-500 hover:text-blue-500 transition-colors"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/revanyangel/" class="text-slate-500 hover:text-pink-500 transition-colors"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <footer class="py-8 text-center text-slate-600 text-sm font-mono border-t border-slate-900 bg-darkbg">
+            <p>&copy; 2025 Revany Angel.</p>
+        </footer>
+
+        <script>
+            // 1. Scroll Reveal Animation
+            const revealElements = document.querySelectorAll('.reveal');
+
+            const revealOnScroll = () => {
+                const windowHeight = window.innerHeight;
+                const elementVisible = 150;
+
+                revealElements.forEach((reveal) => {
+                    const elementTop = reveal.getBoundingClientRect().top;
+                    if (elementTop < windowHeight - elementVisible) {
+                        reveal.classList.add('active');
+                    }
+                });
+            };
+
+            window.addEventListener('scroll', revealOnScroll);
+            // Trigger once on load
+            revealOnScroll();
+
+            // 2. Smooth scrolling for anchor links (Polyfill for older browsers support)
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // 3. Mobile menu toggle with slide/fade animation
+            const menuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (menuButton && mobileMenu) {
+                const openMobileMenu = () => {
+                    // Remove hidden so it's rendered, then add open to animate
+                    mobileMenu.classList.remove('hidden');
+                    // Allow a frame for the browser to register the change
+                    requestAnimationFrame(() => {
+                        mobileMenu.classList.add('open');
+                        menuButton.setAttribute('aria-expanded', 'true');
+                    });
+                };
+
+                const closeMobileMenu = () => {
+                    // Start close animation
+                    mobileMenu.classList.remove('open');
+                    menuButton.setAttribute('aria-expanded', 'false');
+                    // After transition ends, add hidden to remove from layout
+                    const onTransitionEnd = (e) => {
+                        if (e.propertyName === 'opacity') {
+                            mobileMenu.classList.add('hidden');
+                            mobileMenu.removeEventListener('transitionend', onTransitionEnd);
+                        }
+                    };
+                    mobileMenu.addEventListener('transitionend', onTransitionEnd);
+                };
+
+                menuButton.addEventListener('click', () => {
+                    if (mobileMenu.classList.contains('open')) {
+                        closeMobileMenu();
+                    } else {
+                        openMobileMenu();
+                    }
+                });
+
+                // Close mobile menu when a link is clicked
+                mobileMenu.querySelectorAll('a[href^="#"]').forEach(link => {
+                    link.addEventListener('click', () => {
+                        // Let the smooth scroll happen, then close menu
+                        closeMobileMenu();
+                    });
+                });
+
+                // Hide mobile menu if resizing to desktop width
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth >= 768 && !mobileMenu.classList.contains('hidden')) {
+                        // Force immediate hide on large screens
+                        mobileMenu.classList.remove('open');
+                        mobileMenu.classList.add('hidden');
+                        menuButton.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>
