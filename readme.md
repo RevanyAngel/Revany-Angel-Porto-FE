@@ -7,10 +7,10 @@ Selamat datang di repository portofolio saya! Project ini adalah website portofo
 
 ---
 
-<p style="align:center;">
-  <img src="assets/images/preview_1.png" alt="Revany Angel Portfolio" width="600">
-  <img src="assets/images/preview_2.png" alt="Revany Angel Portfolio" width="600">
-  <img src="assets/images/preview_3.png" alt="Revany Angel Portfolio" width="600">
+<p align="center">
+  <img src="assets/images/preview_1.png" width="600">
+  <img src="assets/images/preview_2.png" width="600">
+  <img src="assets/images/preview_3.png" width="600">
 </p>
 
 ---
