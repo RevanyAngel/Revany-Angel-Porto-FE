@@ -50,9 +50,9 @@ Jika Anda ingin menjalankan atau memodifikasi project ini secara lokal:
    ```bash
    git clone [https://github.com/RevanyAngel/revany-portfolio.git](https://github.com/RevanyAngel/revany-portfolio.git)
 
-2. **Buka folder project::**
+2. **Buka folder project:**
    ```bash
    cd revany-portfolio
 
 3. **Jalankan:**
-Buka file index.html langsung di browser atau gunakan extension Live Server di VS Code.
+  Buka file index.html langsung di browser atau gunakan extension Live Server di VS Code.
