@@ -1,188 +1,478 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Revany Angel Portfolio</title>
-        
-        <script src="https://cdn.tailwindcss.com"></script>
-        
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-        
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        <script>
-            tailwind.config = {
-                darkMode: 'class',
-                theme: {
-                    extend: {
-                        fontFamily: {
-                            sans: ['Inter', 'sans-serif'],
-                            mono: ['JetBrains Mono', 'monospace'],
-                        },
-                        colors: {
-                            neon: '#22d3ee', // Cyan-400 equivalent
-                            darkbg: '#0f172a', // Slate-900
-                            cardbg: '#1e293b', // Slate-800
-                        },
-                        animation: {
-                            'float': 'float 6s ease-in-out infinite',
-                        },
-                        keyframes: {
-                            float: {
-                                '0%, 100%': { transform: 'translateY(0)' },
-                                '50%': { transform: 'translateY(-10px)' },
-                            }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revany Angel Portfolio</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        neon: '#22d3ee', // Cyan-400 equivalent
+                        darkbg: '#0f172a', // Slate-900
+                        cardbg: '#1e293b', // Slate-800
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
                         }
                     }
                 }
             }
-        </script>
+        }
+    </script>
 
-        <style>
-            /* Custom Scrollbar */
-            ::-webkit-scrollbar {
-                width: 8px;
-            }
-            ::-webkit-scrollbar-track {
-                background: #0f172a; 
-            }
-            ::-webkit-scrollbar-thumb {
-                background: #334155; 
-                border-radius: 4px;
-            }
-            ::-webkit-scrollbar-thumb:hover {
-                background: #22d3ee; 
-            }
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
 
-            /* Utility for Reveal Animation */
-            .reveal {
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #22d3ee;
+        }
+
+        /* Utility for Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mobile menu animation */
+        #mobile-menu {
+            transition: opacity 220ms ease, transform 220ms ease;
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+
+        #mobile-menu.open {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Profile overlay specifics */
+        .profile-overlay {
+            backdrop-filter: blur(4px);
+        }
+
+        /* Profile image entrance animation */
+        @keyframes profileReveal {
+            0% {
                 opacity: 0;
-                transform: translateY(30px);
-                transition: all 0.8s ease-out;
+                transform: scale(0.7) rotate(-8deg);
             }
-            .reveal.active {
+
+            60% {
+                opacity: 1;
+                transform: scale(1.05) rotate(1deg);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .profile-entrance {
+            opacity: 0;
+            animation: profileReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+        }
+
+        /* Soft blue glow behind hero name */
+        .hero-name-glow {
+            position: relative;
+            overflow: visible;
+            padding-bottom: 6px;
+        }
+
+        .hero-name-glow::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 110%;
+            height: 140%;
+            background: radial-gradient(ellipse at center, rgba(34, 211, 238, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(20px);
+        }
+
+        /* Skill card pop-in animation */
+        @keyframes skillPopIn {
+            from {
+                opacity: 0;
+                transform: translateY(25px) scale(0.85);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .skill-card {
+            opacity: 0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .skill-card.animate-in {
+            animation: skillPopIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-6px) !important;
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.3), 0 8px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Hero staggered entrance animations */
+        @keyframes heroFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
                 opacity: 1;
                 transform: translateY(0);
             }
-            /* Mobile menu animation */
-            #mobile-menu {
-                transition: opacity 220ms ease, transform 220ms ease;
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-            #mobile-menu.open {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            /* Profile overlay specifics */
-            .profile-overlay {
-                backdrop-filter: blur(4px);
-            }
-        </style>
-    </head>
-    <body class="bg-darkbg text-slate-300 font-sans antialiased selection:bg-neon selection:text-darkbg overflow-x-hidden">
+        }
 
-        <nav class="fixed w-full z-50 backdrop-blur-md bg-darkbg/80 border-b border-slate-800">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <div class="flex-shrink-0">
-                        <span class="font-mono text-xl font-bold text-neon">&lt;Portfolio&gt;</span>
-                    </div>
-                    <div class="hidden md:block">
-                        <div class="ml-10 flex items-baseline space-x-8">
-                            <a href="#home" class="hover:text-neon px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
-                            <a href="#about" class="hover:text-neon px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
-                            <a href="#showcase" class="hover:text-neon px-3 py-2 rounded-md text-sm font-medium transition-colors">Work</a>
-                            <a href="#contact" class="px-4 py-2 border border-neon text-neon rounded-md text-sm font-medium hover:bg-neon hover:text-darkbg transition-all shadow-[0_0_10px_rgba(34,211,238,0.3)]">Let's Talk</a>
-                        </div>
-                    </div>
-                    <div class="-mr-2 flex md:hidden">
-                        <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 focus:outline-none" aria-controls="mobile-menu" aria-expanded="false" aria-label="Toggle mobile menu">
-                            <i class="fa-solid fa-bars text-xl"></i>
-                        </button>
+        @keyframes heroFadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-60px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                text-shadow: 0 0 10px rgba(34, 211, 238, 0.4), 0 0 40px rgba(34, 211, 238, 0.1);
+            }
+
+            50% {
+                text-shadow: 0 0 20px rgba(34, 211, 238, 0.6), 0 0 60px rgba(34, 211, 238, 0.2);
+            }
+        }
+
+        .hero-stagger-1 {
+            opacity: 0;
+            animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+        }
+
+        .hero-stagger-2 {
+            opacity: 0;
+            animation: slideInFromLeft 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+        }
+
+        .hero-stagger-3 {
+            opacity: 0;
+            animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
+        }
+
+        .hero-stagger-4 {
+            opacity: 0;
+            animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.2s forwards;
+        }
+
+        .hero-stagger-5 {
+            opacity: 0;
+            animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards;
+        }
+
+        .hero-stagger-6 {
+            opacity: 0;
+            animation: heroFadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.8s forwards;
+        }
+
+        /* Typewriter cursor blink */
+        @keyframes cursorBlink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        #typewriter-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.15em;
+            background: #22d3ee;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: cursorBlink 0.75s step-end infinite;
+        }
+
+        /* Hero name gradient */
+        .hero-name-gradient {
+            background: linear-gradient(135deg, #e2e8f0 0%, #22d3ee 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glowPulse 4s ease-in-out infinite;
+        }
+
+        /* Social icon glow on hover */
+        .social-icon-hero {
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .social-icon-hero:hover {
+            transform: translateY(-4px) scale(1.15);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.5), 0 0 40px rgba(34, 211, 238, 0.2);
+            border-color: #22d3ee !important;
+            color: #22d3ee !important;
+        }
+
+        /* Download CV button shimmer */
+        @keyframes shimmer {
+            0% {
+                background-position: -200% center;
+            }
+
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        .btn-download-cv {
+            background: linear-gradient(90deg, #22d3ee, #06b6d4, #0891b2, #06b6d4, #22d3ee);
+            background-size: 200% auto;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-download-cv:hover {
+            animation: shimmer 2s linear infinite;
+            box-shadow: 0 0 25px rgba(34, 211, 238, 0.5), 0 0 50px rgba(34, 211, 238, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Projects button */
+        .btn-projects {
+            border: 1.5px solid rgba(34, 211, 238, 0.4);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-projects:hover {
+            border-color: #22d3ee;
+            background: rgba(34, 211, 238, 0.1);
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body class="bg-darkbg text-slate-300 font-sans antialiased selection:bg-neon selection:text-darkbg overflow-x-hidden">
+
+    <nav class="fixed w-full z-50 backdrop-blur-md bg-darkbg/80 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <span class="font-mono text-xl font-bold text-neon">&lt;Portfolio&gt;</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#home"
+                            class="hover:text-neon px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
+                        <a href="#about"
+                            class="hover:text-neon px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
+                        <a href="#showcase"
+                            class="hover:text-neon px-3 py-2 rounded-md text-sm font-medium transition-colors">Work</a>
+                        <a href="#contact"
+                            class="px-4 py-2 border border-neon text-neon rounded-md text-sm font-medium hover:bg-neon hover:text-darkbg transition-all shadow-[0_0_10px_rgba(34,211,238,0.3)]">Let's
+                            Talk</a>
                     </div>
                 </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button id="mobile-menu-button" type="button"
+                        class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 focus:outline-none"
+                        aria-controls="mobile-menu" aria-expanded="false" aria-label="Toggle mobile menu">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
             </div>
-        </nav>
-        <!-- Mobile menu (hidden by default) -->
-        <div id="mobile-menu" class="md:hidden hidden">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-darkbg/95 border-t border-slate-800">
-                <a href="#home" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-neon">Home</a>
-                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-neon">About</a>
-                <a href="#showcase" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-neon">Work</a>
-                <a href="#contact" class="block px-3 py-3 mt-1 border border-neon text-neon rounded-md text-base font-medium hover:bg-neon hover:text-darkbg">Let's Talk</a>
+        </div>
+    </nav>
+    <!-- Mobile menu (hidden by default) -->
+    <div id="mobile-menu" class="md:hidden hidden">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-darkbg/95 border-t border-slate-800">
+            <a href="#home"
+                class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-neon">Home</a>
+            <a href="#about"
+                class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-neon">About</a>
+            <a href="#showcase"
+                class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-neon">Work</a>
+            <a href="#contact"
+                class="block px-3 py-3 mt-1 border border-neon text-neon rounded-md text-base font-medium hover:bg-neon hover:text-darkbg">Let's
+                Talk</a>
+        </div>
+    </div>
+
+    <section id="home" class="min-h-screen flex items-center justify-center relative pt-16">
+        <div class="absolute inset-0 z-0 opacity-20"
+            style="background-image: radial-gradient(#334155 1px, transparent 1px); background-size: 30px 30px;"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="flex justify-center items-center">
+                    <!-- Profile image wrapper (larger, matched to text height) -->
+                    <div class="relative group w-56 h-56 md:w-80 md:h-80 md:mr-8 profile-entrance">
+                        <img src="assets/images/2.jpg" alt="Revany Angel"
+                            class="rounded-full object-cover w-full h-full shadow-[0_0_40px_rgba(34,211,238,0.15),0_0_80px_rgba(34,211,238,0.08)] transform transition-all duration-500 group-hover:scale-105 group-hover:rotate-1 ring-4 ring-slate-700/50 group-hover:ring-neon/60" />
+                        <div
+                            class="absolute -inset-2 rounded-full bg-gradient-to-tr from-neon/10 via-transparent to-cyan-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center md:text-left">
+                    <!-- Large name title - horizontal layout like screenshot -->
+                    <div class="hero-stagger-1 mb-2">
+                        <h1
+                            class="hero-name-glow flex flex-row items-baseline justify-center md:justify-start gap-3 md:gap-4 flex-nowrap whitespace-nowrap">
+                            <span
+                                class="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-normal">Revany</span>
+                            <span
+                                class="text-4xl md:text-5xl lg:text-6xl font-bold hero-name-gradient leading-normal">Angel</span>
+                        </h1>
+                    </div>
+
+                    <!-- Typewriter subtitle -->
+                    <div class="hero-stagger-2 mt-4 mb-6">
+                        <p class="text-lg md:text-xl text-slate-300 font-medium tracking-wide">
+                            <span id="typewriter-text"></span><span id="typewriter-cursor"></span>
+                        </p>
+                    </div>
+
+                    <!-- Description paragraph -->
+                    <p
+                        class="hero-stagger-3 max-w-xl mx-auto md:mx-0 text-base md:text-lg text-slate-400 mb-8 leading-relaxed">
+                        I have strong interest in Front End Development, eager to learn and have experience working on
+                        several projects, both mini projects and team projects.
+                    </p>
+
+                    <!-- Buttons: Download CV + Projects -->
+                    <div class="hero-stagger-4 flex justify-center md:justify-start gap-4 mb-8">
+                        <a href="https://docs.google.com/presentation/d/1XmXDIfdRxskHVRScWthVVeLRUYHs2OXBwmWchKAq6b0/edit?usp=sharing"
+                            target="_blank" rel="noopener noreferrer"
+                            class="btn-download-cv inline-flex items-center gap-2 px-7 py-3 font-bold text-darkbg rounded-full text-sm md:text-base">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Download CV</span>
+                        </a>
+                        <a href="#showcase"
+                            class="btn-projects inline-flex items-center gap-2 px-7 py-3 font-bold text-slate-200 rounded-full text-sm md:text-base">
+                            <span>Projects</span>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+
+                    <!-- Social icons: GitHub, LinkedIn, Instagram -->
+                    <div class="hero-stagger-5 flex justify-center md:justify-start gap-4">
+                        <a href="https://github.com/RevanyAngel" target="_blank" rel="noopener noreferrer"
+                            class="social-icon-hero w-11 h-11 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 text-lg"
+                            aria-label="GitHub">
+                            <i class="fa-brands fa-github"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/revany-angel" target="_blank" rel="noopener noreferrer"
+                            class="social-icon-hero w-11 h-11 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 text-lg"
+                            aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                        <a href="https://www.instagram.com/revanyangel/" target="_blank" rel="noopener noreferrer"
+                            class="social-icon-hero w-11 h-11 rounded-full border border-slate-700 flex items-center justify-center text-slate-400 text-lg"
+                            aria-label="Instagram">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <section id="home" class="min-h-screen flex items-center justify-center relative pt-16">
-            <div class="absolute inset-0 z-0 opacity-20" style="background-image: radial-gradient(#334155 1px, transparent 1px); background-size: 30px 30px;"></div>
-            
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    <div class="flex justify-center items-center">
-                        <!-- Profile image wrapper (larger, aligned with text) -->
-                        <div class="relative group w-48 h-48 md:w-72 md:h-72 md:mr-8">
-                            <!-- Replace the src with your local image at `assets/images/profile.jpg` if desired -->
-                            <img src="assets/images/2.jpg" alt="Revany Angel" class="rounded-full object-cover w-full h-full shadow-2xl transform transition-all duration-500 group-hover:scale-105 group-hover:rotate-1 ring-4 ring-transparent group-hover:ring-neon/60" />
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-slate-500">
+            <i class="fa-solid fa-arrow-down text-xl"></i>
+        </div>
+    </section>
 
-                            <!-- (optional overlay placeholder kept commented) -->
-                            <!--
-                            <div class="profile-overlay absolute inset-0 rounded-full bg-darkbg/75 flex items-center justify-center text-center p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                                <div>
-                                    <p class="text-neon font-mono text-sm mb-1">Revany Angel</p>
-                                    <p class="text-slate-200 text-sm">Mahasiswa TI • Frontend & UI/UX</p>
-                                </div>
-                            </div>
-                            -->
-                        </div>
-                    </div>
+    <section id="about" class="py-20 bg-cardbg/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 
-                    <div class="text-center md:text-left">
-                        <p class="font-mono text-neon mb-4 tracking-wider animate-pulse">HELLO, WORLD.</p>
-                        <h1 class="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
-                            I am <span class="font-light">Revany Angel</span>
-                        </h1>
-                        <p class="mt-2 max-w-xl mx-auto md:mx-0 text-lg text-slate-400 mb-6">
-                            I have strong interest in Front End Development, eager to learn and have experience working on several projects, both mini projects and team projects.
-                        </p>
-
-                        <div class="flex justify-center md:justify-start gap-4">
-                            <a href="#showcase" class="group relative px-6 py-3 font-bold text-darkbg rounded-full bg-neon overflow-hidden transition-all hover:shadow-[0_0_20px_rgba(34,211,238,0.6)]">
-                                <span class="relative z-10">Explore My Work</span>
-                                <div class="absolute inset-0 h-full w-full scale-0 rounded-full transition-all duration-300 group-hover:scale-100 group-hover:bg-white/30"></div>
-                            </a>
-                            <a href="#contact" class="px-6 py-3 font-bold text-white border border-slate-600 rounded-full hover:border-white transition-all">
-                                Contact Me
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-slate-500">
-                <i class="fa-solid fa-arrow-down text-xl"></i>
-            </div>
-        </section>
-
-        <section id="about" class="py-20 bg-cardbg/30">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                    
-                    <div class="reveal">
-                        <h2 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
-                            <span class="text-neon font-mono">01.</span> About Me
-                        </h2>
-                        <p class="text-slate-400 leading-relaxed mb-6">
-                            I am an Informatics Engineering student who have experienced in building responsive web interfaces using HTML, CSS, and JavaScript through academic and personal projects. Detail-oriented in UI consistency and user experience. Currently expanding skills in modern front-end practices and committed to continuous improvement. 
-                        </p>
-                        <!-- <p class="text-slate-400 leading-relaxed mb-8">
+                <div class="reveal">
+                    <h2 class="text-3xl font-bold text-white mb-6 flex items-center gap-3">
+                        <span class="text-neon font-mono">01.</span> About Me
+                    </h2>
+                    <p class="text-slate-400 leading-relaxed mb-6">
+                        I am an Informatics Engineering student who have experienced in building responsive web
+                        interfaces using HTML, CSS, and JavaScript through academic and personal projects.
+                        Detail-oriented in UI consistency and user experience. Currently expanding skills in modern
+                        front-end practices and committed to continuous improvement.
+                    </p>
+                    <!-- <p class="text-slate-400 leading-relaxed mb-8">
                             Saya juga memiliki ketertarikan dalam hal web development. Saya telah mempelajari dasar-dasar pengembangan web secara otodidak, serta mengembangkan beberapa proyek sederhana sebagai latihan. Saya bersemangat untuk terus belajar dan mengasah keterampilan saya di bidang ini.
                         </p> -->
-                        
-                        <!-- <div class="flex gap-8 border-t border-slate-700 pt-6">
+
+                    <!-- <div class="flex gap-8 border-t border-slate-700 pt-6">
                             <div>
                                 <span class="block text-3xl font-bold text-white">3+</span>
                                 <span class="text-sm text-slate-500 font-mono">Years Coding</span>
@@ -192,333 +482,363 @@
                                 <span class="text-sm text-slate-500 font-mono">Projects Done</span>
                             </div>
                         </div> -->
-                    </div>
+                </div>
 
-                    <div class="reveal relative bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl">
-                        <div class="absolute -top-4 -right-4 w-20 h-20 bg-neon/20 rounded-full blur-2xl"></div>
-                        
-                        <!-- <h3 class="font-mono text-center text-slate-300 mb-6 border-b border-slate-700 pb-2">The Hybrid Stack</h3> -->
-                        
-                        <div class="grid grid-cols-1 gap-8">
-                            <div class="text-center border-r border-slate-700 pr-4">
-                                <h4 class="text-neon font-bold mb-4"><i class="fa-solid fa-code"></i> DEVELOPMENT</h4>
-                                <ul class="space-y-2 font-mono text-sm text-slate-400">
-                                    <li class="hover:text-white transition-colors">HTML5 & Semantic</li>
-                                    <li class="hover:text-white transition-colors">CSS</li>
-                                    <li class="hover:text-white transition-colors">JavaScript</li>
-                                    <li class="hover:text-white transition-colors">React (Basic)</li>
-                                </ul>
-                            </div>
-                            
-                            <!-- <div class="text-left pl-4">
-                                <h4 class="text-lime-400 font-bold mb-4"><i class="fa-solid fa-pen-nib"></i> CREATIVE</h4>
-                                <ul class="space-y-2 font-mono text-sm text-slate-400">
-                                    <li class="hover:text-white transition-colors">Document Formatting</li>
-                                    <li class="hover:text-white transition-colors">Graphic Design</li>
-                                    <li class="hover:text-white transition-colors">Video Editing</li>
-                                </ul>
-                            </div> -->
+                <div class="reveal relative bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl">
+                    <div class="absolute -top-4 -right-4 w-20 h-20 bg-neon/20 rounded-full blur-2xl"></div>
+
+                    <h4 class="text-neon font-bold mb-6 text-center"><i class="fa-solid fa-code"></i> DEVELOPMENT</h4>
+
+                    <div id="skills-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- HTML5 -->
+                        <div
+                            class="skill-card flex flex-col items-center gap-3 bg-slate-700/40 rounded-xl p-5 border border-slate-600/50 cursor-default">
+                            <i class="fa-brands fa-html5 text-4xl text-orange-500"></i>
+                            <span class="font-mono text-sm text-slate-300">HTML5</span>
+                        </div>
+                        <!-- CSS3 -->
+                        <div
+                            class="skill-card flex flex-col items-center gap-3 bg-slate-700/40 rounded-xl p-5 border border-slate-600/50 cursor-default">
+                            <i class="fa-brands fa-css3-alt text-4xl text-blue-500"></i>
+                            <span class="font-mono text-sm text-slate-300">CSS3</span>
+                        </div>
+                        <!-- JavaScript -->
+                        <div
+                            class="skill-card flex flex-col items-center gap-3 bg-slate-700/40 rounded-xl p-5 border border-slate-600/50 cursor-default">
+                            <i class="fa-brands fa-js text-4xl text-yellow-400"></i>
+                            <span class="font-mono text-sm text-slate-300">JavaScript</span>
+                        </div>
+                        <!-- React -->
+                        <div
+                            class="skill-card flex flex-col items-center gap-3 bg-slate-700/40 rounded-xl p-5 border border-slate-600/50 cursor-default">
+                            <i class="fa-brands fa-react text-4xl text-cyan-400"></i>
+                            <span class="font-mono text-sm text-slate-300">React</span>
                         </div>
                     </div>
-
                 </div>
+
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section id="showcase" class="py-24">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16 reveal">
-                    <h2 class="text-3xl font-bold text-white mb-4">
-                        <span class="text-neon font-mono">02.</span> Selected Works
-                    </h2>
-                    <p class="text-slate-400 max-w-xl mx-auto">
-                        Koleksi terpilih dari Front End Projects yang telah dibuat.
-                    </p>
-                </div>
-
-                <div class="columns-1 md:columns-2 lg:columns-4 gap-6 space-y-6 reveal">
-                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
-                        <img src="assets/images/web 01.jpeg" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
-                            <h3 class="text-white font-bold text-xl">EDU VAULT</h3>
-                            <p class="text-slate-300 text-sm mt-2">Website penyedia layanan buku online, bisa disebut perpustakaan online yang menyediakan berbagai pilihan buku dan jurnal.</p>
-                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
-                                <a href="https://github.com/RevanyAngel/Edu-Vault" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Code
-                                </a>
-                                <a href="https://revanyangel.github.io/Edu-Vault/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Demo
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
-                        <img src="assets/images/web 02.jpeg" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
-                            <h3 class="text-white font-bold text-xl">EPUB Reader</h3>
-                            <p class="text-slate-300 text-sm mt-2">Membuat website untuk menyimpan dan membaca buku dari file epub yang diunggah.</p>
-                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
-                                <a href="https://github.com/RevanyAngel/epub-reader-FST" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Code
-                                </a>
-                                <a href="https://epub-reader.ct.ws" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Demo
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
-                        <img src="assets/images/web3.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
-                            <h3 class="text-white font-bold text-xl">Simple To Do list</h3>
-                            <p class="text-slate-300 text-sm mt-2">Membuat to do list sederhana sebagai pengingat aktivitas harian.</p>
-                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
-                                <a href="https://github.com/RevanyAngel/to-do-list" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Code
-                                </a>
-                                <a href="https://revanyangel.github.io/to-do-list/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Demo
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
-                        <img src="assets/images/web2.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
-                            <h3 class="text-white font-bold text-xl">Age Calculator</h3>
-                            <p class="text-slate-300 text-sm mt-2">Membuat sistem penghitung umur yang dapat memberi tahu jumlah umur berdasarkan tanggal yang diinput secara otomatis dengan JS</p>
-                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
-                                <a href="https://github.com/RevanyAngel/Age-Calculator" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Code
-                                </a>
-                                <a href="https://revanyangel.github.io/Age-Calculator/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Demo
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
-                        <img src="assets/images/web4.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
-                            <h3 class="text-white font-bold text-xl">Pomodoro TImer</h3>
-                            <p class="text-slate-300 text-sm mt-2">Membuat sistem Pomodoro yang dilengkapi dengan to do list dan distraction list untuk menunjang produktivitas.</p>
-                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
-                                <a href="https://github.com/RevanyAngel/MyTimer-v2" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Code
-                                </a>
-                                <a href="https://revanyangel.github.io/MyTimer-v2/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Demo
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
-                        <img src="assets/images/web5.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
-                            <h3 class="text-white font-bold text-xl">Simple Homepage</h3>
-                            <p class="text-slate-300 text-sm mt-2">Membuat Homepage sederhana dengan memperhatikan responsiveness di berbagai perangkat.</p>
-                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
-                                <a href="https://github.com/RevanyAngel/simple-homepage" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Code
-                                </a>
-                                <a href="https://revanyangel.github.io/simple-homepage/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Demo
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
-                        <img src="assets/images/web6.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                            <span class="text-neon font-mono text-xs mb-2">Web Development</span>
-                            <h3 class="text-white font-bold text-xl">Cookie Consent</h3>
-                            <p class="text-slate-300 text-sm mt-2">Membuat pop up cookies untuk keperluan website.</p>
-                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
-                                <a href="https://github.com/RevanyAngel/Cookie-Consent" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Code
-                                </a>
-                                <a href="https://revanyangel.github.io/Cookie-Consent/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Demo
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
-                        <img src="assets/images/web7.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                            <span class="text-neon font-mono text-xs mb-2">Mini Game</span>
-                            <h3 class="text-white font-bold text-xl">Game Bunny Eating</h3>
-                            <p class="text-slate-300 text-sm mt-2">Membuat mini game bunny memakan wortel sebanyaknya untuk mendapat skor dan menghindari bom agar tidak game over.</p>
-                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
-                                <a href="https://github.com/RevanyAngel/Bunny-mam-wortel" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Code
-                                </a>
-                                <a href="https://revanyangel.github.io/Bunny-mam-wortel/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Demo
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
-                        <img src="assets/images/web8.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                            <span class="text-neon font-mono text-xs mb-2">Mini Game</span>
-                            <h3 class="text-white font-bold text-xl">Memory Game</h3>
-                            <p class="text-slate-300 text-sm mt-2">Membuat mini game untuk melatih daya ingat dengan mencocokkan gambar yang sesuai.</p>
-                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
-                                <a href="https://github.com/RevanyAngel/memory-game" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Code
-                                </a>
-                                <a href="https://revanyangel.github.io/memory-game/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Demo
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="group relative break-inside-avoid rounded-xl overflow-hidden cursor-pointer">
-                        <img src="assets/images/web9.png" alt="Web Project" class="w-full h-auto object-cover transform transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-darkbg via-darkbg/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                            <span class="text-neon font-mono text-xs mb-2">Mini Game</span>
-                            <h3 class="text-white font-bold text-xl">Snake Game</h3>
-                            <p class="text-slate-300 text-sm mt-2">Membuat mini game ular mencari poin agar ular semakin panjang tetapi jangan sampai tertabrak agar tidak game over.</p>
-                            <div class="flex justify-between items-center border-t border-white/10 pt-4">
-                                <a href="https://github.com/RevanyAngel/mini-snake-game" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Code
-                                </a>
-                                <a href="https://revanyangel.github.io/mini-snake-game/" target="_blank" class="text-neon text-sm font-mono hover:text-white transition">
-                                    Demo
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <section id="contact" class="py-24 bg-cardbg/20 border-t border-slate-800">
-            <div class="max-w-3xl mx-auto px-4 text-center reveal">
-                <h2 class="text-3xl font-bold text-white mb-8">Ready to Collaborate?</h2>
-                <p class="text-slate-400 mb-10">
-                    Saya terbuka untuk kesempatan freelance atau proyek kolaborasi. Mari diskusikan bagaimana saya dapat membantu project Anda.
+    <section id="showcase" class="py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl font-bold text-white mb-4">
+                    <span class="text-neon font-mono">02.</span> Selected Projects
+                </h2>
+                <p class="text-slate-400 max-w-xl mx-auto">
+                    A curated collection of Front End Projects I have built.
                 </p>
-                
-                <a href="mailto:revanypursan@gmail.com" class="inline-flex items-center gap-3 px-8 py-4 bg-neon text-darkbg font-bold rounded-lg hover:bg-white transition-all text-lg mb-12">
-                    <i class="fa-regular fa-envelope"></i> Kirim Email
-                </a>
-
-                <div class="flex justify-center gap-8 text-3xl">
-                    <a href="https://github.com/RevanyAngel" class="text-slate-500 hover:text-white transition-colors"><i class="fa-brands fa-github"></i></a>
-                    <a href="https://www.linkedin.com/in/revany-angel" class="text-slate-500 hover:text-blue-500 transition-colors"><i class="fa-brands fa-linkedin"></i></a>
-                    <a href="https://www.instagram.com/revanyangel/" class="text-slate-500 hover:text-pink-500 transition-colors"><i class="fa-brands fa-instagram"></i></a>
-                </div>
             </div>
-        </section>
 
-        <footer class="py-8 text-center text-slate-600 text-sm font-mono border-t border-slate-900 bg-darkbg">
-            <p>&copy; 2025 Revany Angel.</p>
-        </footer>
+            <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
+                <!-- Projects will be rendered here dynamically via Supabase -->
+            </div>
 
-        <script>
-            // 1. Scroll Reveal Animation
-            const revealElements = document.querySelectorAll('.reveal');
+            <!-- Show More / Show Less Button -->
+            <div class="text-center mt-10 reveal">
+                <button id="toggle-projects-btn"
+                    class="inline-flex items-center gap-2 px-8 py-3 rounded-full border border-neon/50 text-neon font-semibold text-sm hover:bg-neon/10 hover:border-neon hover:shadow-[0_0_20px_rgba(34,211,238,0.2)] transition-all duration-300">
+                    <span id="toggle-projects-text">Show More</span>
+                    <i id="toggle-projects-icon"
+                        class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
+                </button>
+            </div>
+        </div>
+    </section>
 
-            const revealOnScroll = () => {
-                const windowHeight = window.innerHeight;
-                const elementVisible = 150;
 
-                revealElements.forEach((reveal) => {
-                    const elementTop = reveal.getBoundingClientRect().top;
-                    if (elementTop < windowHeight - elementVisible) {
-                        reveal.classList.add('active');
-                    }
+
+    <section id="contact" class="py-24 bg-cardbg/20 border-t border-slate-800">
+        <div class="max-w-3xl mx-auto px-4 text-center reveal">
+            <h2 class="text-3xl font-bold text-white mb-8">Ready to Collaborate?</h2>
+            <p class="text-slate-400 mb-10">
+                I am open to freelance opportunities or collaborative projects. Let's discuss how I can help bring your
+                project to life.
+            </p>
+
+            <a href="mailto:revanypursan@gmail.com"
+                class="inline-flex items-center gap-3 px-8 py-4 bg-neon text-darkbg font-bold rounded-lg hover:bg-white transition-all text-lg mb-12">
+                <i class="fa-regular fa-envelope"></i> Send Email
+            </a>
+
+            <div class="flex justify-center gap-8 text-3xl">
+                <a href="https://github.com/RevanyAngel" class="text-slate-500 hover:text-white transition-colors"><i
+                        class="fa-brands fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/revany-angel"
+                    class="text-slate-500 hover:text-blue-500 transition-colors"><i
+                        class="fa-brands fa-linkedin"></i></a>
+                <a href="https://www.instagram.com/revanyangel/"
+                    class="text-slate-500 hover:text-pink-500 transition-colors"><i
+                        class="fa-brands fa-instagram"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-8 text-center text-slate-600 text-sm font-mono border-t border-slate-900 bg-darkbg">
+        <p>&copy; 2025 Revany Angel.</p>
+    </footer>
+
+    <script>
+        // 1. Scroll Reveal Animation
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const elementVisible = 150;
+
+            revealElements.forEach((reveal) => {
+                const elementTop = reveal.getBoundingClientRect().top;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        // Trigger once on load
+        revealOnScroll();
+
+        // 2. Smooth scrolling for anchor links (Polyfill for older browsers support)
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // 3. Mobile menu toggle with slide/fade animation
+        const menuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (menuButton && mobileMenu) {
+            const openMobileMenu = () => {
+                // Remove hidden so it's rendered, then add open to animate
+                mobileMenu.classList.remove('hidden');
+                // Allow a frame for the browser to register the change
+                requestAnimationFrame(() => {
+                    mobileMenu.classList.add('open');
+                    menuButton.setAttribute('aria-expanded', 'true');
                 });
             };
 
-            window.addEventListener('scroll', revealOnScroll);
-            // Trigger once on load
-            revealOnScroll();
+            const closeMobileMenu = () => {
+                // Start close animation
+                mobileMenu.classList.remove('open');
+                menuButton.setAttribute('aria-expanded', 'false');
+                // After transition ends, add hidden to remove from layout
+                const onTransitionEnd = (e) => {
+                    if (e.propertyName === 'opacity') {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenu.removeEventListener('transitionend', onTransitionEnd);
+                    }
+                };
+                mobileMenu.addEventListener('transitionend', onTransitionEnd);
+            };
 
-            // 2. Smooth scrolling for anchor links (Polyfill for older browsers support)
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
+            menuButton.addEventListener('click', () => {
+                if (mobileMenu.classList.contains('open')) {
+                    closeMobileMenu();
+                } else {
+                    openMobileMenu();
+                }
+            });
+
+            // Close mobile menu when a link is clicked
+            mobileMenu.querySelectorAll('a[href^="#"]').forEach(link => {
+                link.addEventListener('click', () => {
+                    // Let the smooth scroll happen, then close menu
+                    closeMobileMenu();
                 });
             });
 
-            // 3. Mobile menu toggle with slide/fade animation
-            const menuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            if (menuButton && mobileMenu) {
-                const openMobileMenu = () => {
-                    // Remove hidden so it's rendered, then add open to animate
-                    mobileMenu.classList.remove('hidden');
-                    // Allow a frame for the browser to register the change
-                    requestAnimationFrame(() => {
-                        mobileMenu.classList.add('open');
-                        menuButton.setAttribute('aria-expanded', 'true');
-                    });
-                };
-
-                const closeMobileMenu = () => {
-                    // Start close animation
+            // Hide mobile menu if resizing to desktop width
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768 && !mobileMenu.classList.contains('hidden')) {
+                    // Force immediate hide on large screens
                     mobileMenu.classList.remove('open');
+                    mobileMenu.classList.add('hidden');
                     menuButton.setAttribute('aria-expanded', 'false');
-                    // After transition ends, add hidden to remove from layout
-                    const onTransitionEnd = (e) => {
-                        if (e.propertyName === 'opacity') {
-                            mobileMenu.classList.add('hidden');
-                            mobileMenu.removeEventListener('transitionend', onTransitionEnd);
-                        }
-                    };
-                    mobileMenu.addEventListener('transitionend', onTransitionEnd);
-                };
+                }
+            });
+        }
 
-                menuButton.addEventListener('click', () => {
-                    if (mobileMenu.classList.contains('open')) {
-                        closeMobileMenu();
-                    } else {
-                        openMobileMenu();
+        // 4. Typewriter Animation for Hero Section
+        const typewriterEl = document.getElementById('typewriter-text');
+        const phrases = [
+            'Informatics Engineering Student',
+            'Web Developer',
+            'Tech Enthusiast'
+        ];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typeSpeed = 80;
+
+        function typeWriter() {
+            const currentPhrase = phrases[phraseIndex];
+
+            if (isDeleting) {
+                // Remove characters
+                typewriterEl.textContent = currentPhrase.substring(0, charIndex - 1);
+                charIndex--;
+                typeSpeed = 40; // Faster when deleting
+            } else {
+                // Add characters
+                typewriterEl.textContent = currentPhrase.substring(0, charIndex + 1);
+                charIndex++;
+                typeSpeed = 80 + Math.random() * 50; // Slightly variable speed for natural feel
+            }
+
+            // Finished typing the full phrase
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                isDeleting = true;
+                typeSpeed = 1800; // Pause before deleting
+            }
+
+            // Finished deleting
+            if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                typeSpeed = 400; // Short pause before typing next phrase
+            }
+
+            setTimeout(typeWriter, typeSpeed);
+        }
+
+        // Start typewriter after the stagger animation delay
+        setTimeout(typeWriter, 600);
+
+        // 5. Skill Card Scroll Animation
+        const skillsGrid = document.getElementById('skills-grid');
+        if (skillsGrid) {
+            const skillCards = skillsGrid.querySelectorAll('.skill-card');
+            let skillsAnimated = false;
+
+            const skillObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && !skillsAnimated) {
+                        skillsAnimated = true;
+                        skillCards.forEach((card, index) => {
+                            setTimeout(() => {
+                                card.classList.add('animate-in');
+                            }, index * 150);
+                        });
                     }
                 });
+            }, { threshold: 0.3 });
 
-                // Close mobile menu when a link is clicked
-                mobileMenu.querySelectorAll('a[href^="#"]').forEach(link => {
-                    link.addEventListener('click', () => {
-                        // Let the smooth scroll happen, then close menu
-                        closeMobileMenu();
-                    });
-                });
+            skillObserver.observe(skillsGrid);
+        }
+        // 6. Supabase Integration & Show More / Less Projects Toggle
 
-                // Hide mobile menu if resizing to desktop width
-                window.addEventListener('resize', () => {
-                    if (window.innerWidth >= 768 && !mobileMenu.classList.contains('hidden')) {
-                        // Force immediate hide on large screens
-                        mobileMenu.classList.remove('open');
-                        mobileMenu.classList.add('hidden');
-                        menuButton.setAttribute('aria-expanded', 'false');
+        // --- KONFIGURASI SUPABASE ---
+        // Ganti 'SUPABASE_URL_DISINI' dan 'SUPABASE_KEY_DISINI' dengan yang ada di dashboard Supabase kamu
+        const supabaseUrl = 'https://puxazekizchfxntaiifu.supabase.co'; // Contoh: https://abcdefghijklmnop.supabase.co
+        const supabaseKey = 'sb_publishable_LN1TPgQW22EmXZisEHsjSw_pGKhVsDM'; // Biasanya diawali dengan eyJ... atau sb_publishable...
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        function setupShowMoreButton() {
+            const toggleBtn = document.getElementById('toggle-projects-btn');
+            if (toggleBtn) {
+                // Remove existing listeners to avoid duplicates if called multiple times
+                const newToggleBtn = toggleBtn.cloneNode(true);
+                toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
+
+                newToggleBtn.addEventListener('click', function () {
+                    const extraProjects = document.querySelectorAll('.project-extra');
+                    if (extraProjects.length === 0) return;
+
+                    const textSpan = document.getElementById('toggle-projects-text');
+                    const icon = document.getElementById('toggle-projects-icon');
+
+                    // Check current state by looking at the first extra project
+                    const isHidden = extraProjects[0].classList.contains('hidden');
+
+                    if (isHidden) {
+                        // Show projects
+                        extraProjects.forEach(project => {
+                            project.classList.remove('hidden');
+                        });
+                        textSpan.textContent = 'Show Less';
+                        icon.classList.add('rotate-180');
+                    } else {
+                        // Hide projects
+                        extraProjects.forEach(project => {
+                            project.classList.add('hidden');
+                        });
+                        textSpan.textContent = 'Show More';
+                        icon.classList.remove('rotate-180');
+
+                        // Optionally scroll back up to the projects grid top
+                        document.getElementById('projects-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 });
             }
-        </script>
-    </body>
+        }
+
+        async function fetchProjects() {
+            try {
+                const { data: projects, error } = await supabaseClient
+                    .from('projects')
+                    .select('*')
+                    .order('order_num', { ascending: true });
+
+                if (error) {
+                    console.error('Gagal mengambil data:', error);
+                    return;
+                }
+
+                if (!projects || projects.length === 0) {
+                    console.log('Tidak ada data project yang ditemukan.');
+                    return;
+                }
+
+                const projectsGrid = document.getElementById('projects-grid');
+                projectsGrid.innerHTML = ''; // Kosongkan container
+
+                // Loop data untuk membuat element HTML
+                projects.forEach((project, index) => {
+                    // Logika untuk menyembunyikan project lebih dari 6
+                    const hiddenClass = index >= 6 ? 'project-extra hidden' : '';
+
+                    const cardHTML = `
+                        <div class="project-card ${hiddenClass} bg-slate-800/70 rounded-2xl border border-slate-700/60 overflow-hidden flex flex-col transition-all duration-400 hover:border-neon/40 hover:shadow-[0_0_30px_rgba(34,211,238,0.1)]">
+                            <div class="relative overflow-hidden aspect-video">
+                                <img src="${project.image_url}" alt="${project.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                            </div>
+                            <div class="p-5 flex flex-col flex-1">
+                                <h3 class="text-white font-bold text-lg mb-2">${project.title}</h3>
+                                <p class="text-slate-400 text-sm leading-relaxed mb-4 flex-1">${project.description}</p>
+                                <div class="flex justify-between items-center pt-3 border-t border-slate-700/50">
+                                    <a href="${project.demo_url}" target="_blank" class="inline-flex items-center gap-1.5 text-neon text-sm font-medium hover:text-white transition-colors">
+                                        Live Demo <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                                    </a>
+                                    <a href="${project.github_url}" target="_blank" class="inline-flex items-center gap-1.5 text-slate-400 text-sm font-medium hover:text-white transition-colors">
+                                        Details <i class="fa-solid fa-arrow-right text-xs"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    projectsGrid.insertAdjacentHTML('beforeend', cardHTML);
+                });
+
+                // Panggil ulang event listener untuk tombol "Show More" karena elementnya baru dirender
+                setupShowMoreButton();
+
+            } catch (err) {
+                console.error('Error fetching data:', err);
+            }
+        }
+
+        // Fetch projects on load
+        fetchProjects();
+
+    </script>
+</body>
+
 </html>
