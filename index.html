@@ -262,6 +262,7 @@
             margin-left: 2px;
             vertical-align: text-bottom;
             animation: cursorBlink 0.75s step-end infinite;
+            box-shadow: 0 0 8px 1px rgba(34, 211, 238, 0.7), 0 0 15px 2px rgba(34, 211, 238, 0.4);
         }
 
         /* Hero name gradient */
@@ -271,6 +272,7 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             animation: glowPulse 4s ease-in-out infinite;
+            padding-bottom: 0.15em; /* Prevents descender clipping for letters like 'g' */
         }
 
         /* Social icon glow on hover */
